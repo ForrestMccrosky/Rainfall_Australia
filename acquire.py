@@ -39,7 +39,7 @@ def get_bmw_data():
     
     It will also print out the shape of the dataframe after removing an unneccasry column
     '''
-    df = pd.read_csv('bmw.csv', index_col=0) ## reading our csv into a pandas dataframe
+    df = pd.read_csv('weatherAUS.csv', index_col=0) ## reading our csv into a pandas dataframe
     
     df = df.reset_index() ## we also are going to reset the index so that the model information
     ## is a useable column
@@ -79,7 +79,7 @@ def summarize_df(df):
     print('------------------------------------------------\n')
     
     ## creating a list of columns I want value counts for
-    list = ['fuelType', 'transmission']
+    list = ['RainToday', 'RainTomorrow', 'Location']
     
     ## using list comprehension to look through our custom list of columns and print
     ## out their value counts
@@ -96,7 +96,8 @@ def univariate_distributions(df):
     '''
     
     ## looking at our continuous variable distributions
-    stats = ['year', 'price', 'mileage', 'tax', 'mpg', 'engineSize']
+    stats = ['Location', 'MinTemp', 'MaxTemp', 'Rainfall', 'Sunshine', 'RainToday', 
+             'RainTomorrow']
     
     ## using list comprehension to look through our custom list of columns and print
     ## out their histograms viewing their distributions
