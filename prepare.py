@@ -24,6 +24,38 @@ import seaborn as sns
 
 ############################# Function File for Preparing Data ############################
 
+def drop_duplcites_and_nulls(df):
+    '''
+    This function is designed to to take in the dataframe and remove certain columns that had more
+    than 50 percent null values and then remove the rows with less than 10 percent duplicates
+    '''
+    
+    df = df.drop_duplicates() ## dropping duplicates
+    
+    ## dropping the columns with about 50 percent or more null values
+    df = df.drop(columns = ['Cloud3pm', 'Cloud9am', 'Sunshine', 'Evaporation'])
+    
+    df = df.dropna() ## dropping the other null because they are now 10 percent less than the 
+    ## amount of observations 
+    
+    return df
+
+def strip_strings(df):
+    '''
+    Stripping string valued columns to avoid complications in exploration and modeling
+    phases of the pipeline
+    '''
+    
+    ## stripping trailing and leading whitespace from string valued columns just in case
+
+    df.model = df.Location.str.strip()
+    df.fuelType = df.WindGustDir.str.strip()
+    df.transmission = df.WindDir9am.str.strip()
+    df.transmission = df.WindDir3pm.str.strip()
+    df.transmission = df.RainToday.str.strip()
+    df.transmission = df.RainTomorrow.str.strip()
+    
+    return df
 
 def split_data(df):
     '''
