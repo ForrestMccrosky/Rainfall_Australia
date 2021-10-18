@@ -17,11 +17,13 @@ from scipy import stats
 from sklearn.model_selection import train_test_split
 
 # import modeling methods
-from sklearn.cluster import KMeans
-from sklearn.metrics import mean_squared_error, r2_score 
-from sklearn.linear_model import LinearRegression, LassoLars, TweedieRegressor
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.metrics import explained_variance_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
 from scipy import stats
 
 # import to remove warnings
