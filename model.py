@@ -25,32 +25,56 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
 from scipy import stats
 
 
-############################# Function File For Modeling Pipeline Phase ################################
+################### Function File For Modeling Pipeline Phase ################################
 
-def select_rfe(X, y, k, return_rankings=False, model=LinearRegression()):
+# Function for model performs. move to explore.py
+def evaluate(X_df, y_df, model):
     '''
-    Function to utilize recursive feature elimination and return a list of the best features 
-    to be used for regression modeling
+    takes in the current X and y datasets and displays a model evaluation report with
+    with confusion matrixes, forming predictions, and classification report
     '''
 
-    # Use the passed model, LinearRegression by default
-    rfe = RFE(model, n_features_to_select=k)
-    rfe.fit(X, y)
-    features = X.columns[rfe.support_].tolist()
-    if return_rankings:
-        rankings = pd.Series(dict(zip(X.columns, rfe.ranking_)))
-        return features, rankings
-    else:
-        return features
+    #prediction
+    pred = model.predict(X_df)
 
+    #score = accuracy
+    acc = model.score(X_df, y_df)
 
-def get_metrics(df, model_name,rmse_validate,r2_validate):
-    '''
-    Function designed to create a dataframe of model metrics for easy comparison of RMSE and R-squared
-    values when using regression machine learning
-    '''
-    df = df.append({
-        'model': model_name,
-        'rmse_outofsample':rmse_validate, 
-        'r^2_outofsample':r2_validate}, ignore_index=True)
-    return df
+    #conf Matrix
+    conf = confusion_matrix(y_df, pred)
+    mat =  pd.DataFrame ((confusion_matrix(y_df, pred )),index = ['actual_not_fraud','actual_fraud'], columns =['pred_not_fraud','pred_fraud' ])
+    rubric_df = pd.DataFrame([['True Negative', 'False positive'], ['False Negative', 'True Positive']], columns=mat.columns, index=mat.index)
+    cf = rubric_df + ': ' + mat.values.astype(str)
+
+    #assign the values
+    tp = conf[1,1]
+    fp =conf[0,1] 
+    fn= conf[1,0]
+    tn =conf[0,0]
+
+    #calculate the rate
+    tpr = tp/(tp+fn)
+    fpr = fp/(fp+tn)
+    tnr = tn/(tn+fp)
+    fnr = fn/(fn+tp)
+
+    #classification report
+    clas_rep =pd.DataFrame(classification_report(y_df, pred, output_dict=True)).T
+    clas_rep.rename(index={'0': "not fraud", '1': "fraud"}, inplace = True)
+    print(f'''
+    The accuracy for our model is {acc:.4%}
+    The True Positive Rate is {tpr:.3%},    The False Positive Rate is {fpr:.3%},
+    The True Negative Rate is {tnr:.3%},    The False Negative Rate is {fnr:.3%}
+    ________________________________________________________________________________
+    ''')
+    print('''
+    The positive is  'fraud'
+    Confusion Matrix
+    ''')
+    display(cf)
+    print('''
+    ________________________________________________________________________________
+    
+    Classification Report:
+    ''')
+    display(clas_rep)
