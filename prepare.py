@@ -24,7 +24,7 @@ import seaborn as sns
 
 ############################# Function File for Preparing Data ############################
 
-def drop_duplcites_and_nulls(df):
+def drop_duplicates_and_nulls(df):
     '''
     This function is designed to to take in the dataframe and remove certain columns that had more
     than 50 percent null values and then remove the rows with less than 10 percent duplicates
@@ -54,6 +54,69 @@ def strip_strings(df):
     df.transmission = df.WindDir3pm.str.strip()
     df.transmission = df.RainToday.str.strip()
     df.transmission = df.RainTomorrow.str.strip()
+    
+    return df
+
+def create_features(df):
+    '''
+    This function takes in the dataframe and creates features from the existing columns such as 
+    rain tomorrow and rain today as categorical encoded columns for modeling and using datetime 
+    to create day and week month columns.
+    '''
+    
+    ## hot encoding the boolean columns so they work better for exploration
+
+    df['raintom'] = np.where(df.RainTomorrow == 'Yes', 1, 0)
+    df['raintod'] = np.where(df.RainToday == 'Yes', 1, 0)
+    
+    ## turn the transaction time to datetime format
+    df.Date = pd.to_datetime(df.Date) 
+    
+    df['month'] = df['Date'].dt.month ## getting month column
+    df['weekday'] = df['Date'].dt.weekday ## getting weekday column
+    
+    return df
+
+def create_bins(df):
+    '''
+    This function looks at the pressure and temperature for each day and creates high and low 
+    categories respective to the range of the pressure and temperatures for each day.
+    '''
+    
+    print('Visualizing pressure to help create low pressure and high pressure categorical columns\n')
+    sns.boxplot(data = df, x = 'Pressure9am')
+    plt.show()
+    
+    ## creating low pressure categorical columns because storms are most commonly formed from 
+    ## low pressure areas which translates into the most common time for rainfall
+    df['low_pressure9am'] = np.where(df['Pressure9am'] < 1015, 1, 0)
+    df['high_pressure9am'] = np.where(df['Pressure9am'] >= 1015, 1, 0)
+    
+    print('Visualizing pressure to help create low pressure and high pressure categorical columns\n')
+    sns.boxplot(data = df, x = 'Pressure3pm')
+    plt.show()
+    
+    ## creating low pressure categorical columns because storms are most commonly formed from 
+    ## low pressure areas which translates into the most common time for rainfall
+    df['low_pressure3pm'] = np.where(df['Pressure3pm'] < 1015, 1, 0)
+    df['high_pressure3pm'] = np.where(df['Pressure3pm'] >= 1015, 1, 0)
+    
+    print('Visualizing temperature to make high temp and low temp categorical columns\n')
+    sns.boxplot(data = df, x = 'Temp9am')
+    plt.show()
+    
+    ## creating high temperature and low temperature categorical columns for 3pm
+
+    df['high_temp9am'] = np.where(df['Temp9am'] > 15, 1, 0)
+    df['low_temp9am'] = np.where(df['Temp9am'] <= 15, 1, 0)
+    
+    print('Visualizing temperature to make high temp and low temp categorical columns\n')
+    sns.boxplot(data = df, x = 'Temp3pm')
+    plt.show()
+    
+    ## creating high temperature and low temperature categorical columns for 3pm
+    df['high_temp3pm'] = np.where(df['Temp3pm'] > 23, 1, 0)
+    df['low_temp3pm'] = np.where(df['Temp3pm'] <= 23, 1, 0)
     
     return df
 
